@@ -6,36 +6,64 @@
  */
 
 import React, {FC, useEffect, useState} from 'react';
-import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  FlatList,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+} from 'react-native';
 
 const App: FC = () => {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<any>([]);
+  const [posts, setPosts] = useState<any[]>([]);
 
   useEffect((): void => {
-    fetch('https://jsonplaceholder.typicode.com/users/')
+    fetch('https://rickandmortyapi.com/api/character')
       .then(res => res.json())
       .then(res => {
         setUsers(res);
       });
   }, []);
 
-  // console.log(users);
+  const getPosts = async () => {
+    await fetch('https://jsonplaceholder.typicode.com/posts/')
+      .then(res => res.json())
+      .then(res => setPosts(res));
+  };
 
   return (
     <SafeAreaView>
-      <ScrollView>
-        {users.map(item => {
-          return (
-            <View key={item.id}>
+      <Text style={styles.red}>Hello</Text>
+      <ScrollView style={styles.scrollBlock}>
+        {!!users.info &&
+          users.results.map((item: any) => {
+            return (
+              <View key={item.id}>
+                <Text>
+                  {item.id} --- {item.name}
+                </Text>
+              </View>
+            );
+          })}
+      </ScrollView>
+      <TouchableHighlight style={styles.button} onPress={getPosts}>
+        <Text>Get posts</Text>
+      </TouchableHighlight>
+      {!!posts.length && (
+        <FlatList
+          data={posts}
+          renderItem={({item}) => (
+            <View>
               <Text>
-                {item.id} --- {item.name}
+                {item.id} ---- {item.title}
               </Text>
             </View>
-          );
-        })}
-      </ScrollView>
-      <Text style={styles.red}>Hello</Text>
-      <Text style={styles.red}>{users[0] && users[0].name}</Text>
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -45,6 +73,19 @@ const styles = StyleSheet.create({
     color: 'red',
     margin: 20,
     fontSize: 30,
+  },
+  scrollBlock: {
+    height: 100,
+    flexDirection: 'column',
+    gap: 20,
+  },
+  button: {
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    backgroundColor: 'aquamarine',
+    borderRadius: 20,
   },
 });
 
